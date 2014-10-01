@@ -6,7 +6,7 @@ self
 module.exports = yeoman.generators.Base.extend({
 	downloadSdk:function() {
 		self = this
-		runScript("add_analytics_dependency.sh")		
+		runScript("add_analytics_dependency.sh")
 	}, 
 	updatePermissions:function() {
 		runScript("update_permissions.sh")
