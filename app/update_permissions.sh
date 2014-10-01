@@ -16,4 +16,4 @@ else
 		print "\t<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />";
 	}1' app/src/main/AndroidManifest.xml > tempfile
 	mv tempfile app/src/main/AndroidManifest.xml
-fi	
+fi
