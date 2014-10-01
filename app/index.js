@@ -6,13 +6,20 @@ self
 module.exports = yeoman.generators.Base.extend({
 	downloadSdk:function() {
 		self = this
-		var file_loc = path.join(__dirname, "add_analytics_dependency.sh");
-		var analytics_dependency = spawn(file_loc)
-		analytics_dependency.stdout.on('data', function (data) {
-  			console.log('' + data);
-		});
-		analytics_dependency.stderr.on('data', function (data) {
-  			console.log('stderr: ' + data);
-		});		
+		runScript("add_analytics_dependency.sh")		
+	}, 
+	updatePermissions:function() {
+		runScript("update_permissions.sh")
 	}
 })
+
+function runScript(name) {
+	var file_loc = path.join(__dirname, name)
+	var script = spawn(file_loc)
+	script.stdout.on('data', function (data) {
+		console.log('' + data);
+	});
+	script.stderr.on('data', function (data) {
+		console.log('stderr: ' + data);
+	});	
+}
