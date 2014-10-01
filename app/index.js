@@ -13,6 +13,6 @@ module.exports = yeoman.generators.Base.extend({
 		});
 		analytics_dependency.stderr.on('data', function (data) {
   			console.log('stderr: ' + data);
-		});
+		});		
 	}
 })
