@@ -30,9 +30,7 @@ module.exports = yeoman.generators.Base.extend({
 			done()
 		}.bind(this))
 	},
-	promptTrackerGeneration:function() {
-		addTracker()
-	}	
+	promptTrackerGeneration: addTracker
 })
 
 function runScript(name, params) {
