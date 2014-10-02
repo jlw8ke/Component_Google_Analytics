@@ -1,7 +1,8 @@
 var yeoman = require('yeoman-generator'),
 execSync = require("exec-sync"),
 path = require('path'),
-self
+self,
+trackers = new Array()
 
 module.exports = yeoman.generators.Base.extend({
 	downloadSdk:function() {
@@ -28,8 +29,39 @@ module.exports = yeoman.generators.Base.extend({
 			}
 			done()
 		}.bind(this))
+	},
+	promptTrackerGeneration:function() {
+		addTracker()
 	}	
 })
+
+function addTracker() {
+	var done = self.async()
+	self.prompt([{
+		type : 'input',
+		name : 'tracker',
+		message : 'What is the tracker name: (q to finish)',
+		validate : function(input) {
+			var done = this.async()
+			setTimeout(function() {
+				if(!input) {
+					done("You need to name your tracker")
+					return
+				}
+				done(true)
+			}, 10)
+		}
+	}], function (answers) {
+		if(answers.tracker === "q") {
+					self.log(trackers)
+			done()
+		} else {
+			trackers.push(answers.tracker)
+			addTracker()
+			done()
+		}
+	}.bind(self))
+}
 
 function runScript(name, params) {
 	var file_loc = path.join(__dirname, name)
