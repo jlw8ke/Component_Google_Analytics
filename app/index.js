@@ -35,6 +35,17 @@ module.exports = yeoman.generators.Base.extend({
 	}	
 })
 
+function runScript(name, params) {
+	var file_loc = path.join(__dirname, name)
+	var paramsString = ""
+	if(params) {
+		paramsString = params.toString().replace(",", " ")
+	}
+	var script = execSync(file_loc.concat(" "+paramsString))
+	process.stdout.write(script)
+	process.stdout.write('\n')	
+}
+
 function addTracker() {
 	var done = self.async()
 	self.prompt([{
@@ -53,7 +64,7 @@ function addTracker() {
 		}
 	}], function (answers) {
 		if(answers.tracker === "q") {
-					self.log(trackers)
+			self.log(trackers)
 			done()
 		} else {
 			trackers.push(answers.tracker)
@@ -61,16 +72,5 @@ function addTracker() {
 			done()
 		}
 	}.bind(self))
-}
-
-function runScript(name, params) {
-	var file_loc = path.join(__dirname, name)
-	var paramsString = ""
-	if(params) {
-		paramsString = params.toString().replace(",", " ")
-	}
-	var script = execSync(file_loc.concat(" "+paramsString))
-	process.stdout.write(script)
-	process.stdout.write('\n')	
 }
 
