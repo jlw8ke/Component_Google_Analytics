@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "yeoman-generator": "^0.17.7"
+    "yeoman-generator": "^0.17.7",
+    "execSync": "~1.0.0"
   }
 }
