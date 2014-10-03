@@ -1,7 +1,6 @@
 #!/bin/bash
 proguard=$1
 echo "Setting up the proguard document"
-
 cat <<EOF >> $proguard
 -keep class * extends java.util.ListResourceBundle {
 	protected Object[][] getContents();
@@ -20,4 +19,5 @@ cat <<EOF >> $proguard
 	public static final ** CREATOR;
 }
 EOF
+
 

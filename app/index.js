@@ -1,6 +1,7 @@
 var yeoman = require('yeoman-generator'),
 execSync = require("exec-sync"),
 path = require('path'),
+fs = require('fs'),
 self,
 trackers = new Array()
 
@@ -33,17 +34,6 @@ module.exports = yeoman.generators.Base.extend({
 	promptTrackerGeneration: addTracker
 })
 
-function runScript(name, params) {
-	var file_loc = path.join(__dirname, name)
-	var paramsString = ""
-	if(params) {
-		paramsString = params.toString().replace(",", " ")
-	}
-	var script = execSync(file_loc.concat(" "+paramsString))
-	process.stdout.write(script)
-	process.stdout.write('\n')	
-}
-
 function addTracker() {
 	var done = self.async()
 	self.prompt([{
@@ -57,12 +47,25 @@ function addTracker() {
 					done("You need to name your tracker")
 					return
 				}
+				if(trackers.indexOf(filterInput(input)) > -1) {
+					done("Tracker already exists")
+					return
+				}
+				var pass = input.match("^([a-z|A-Z])+$")
+				if(!pass) {
+					done("Invalid tracker name, fucker")
+					return
+				}
 				done(true)
-			}, 10)
+			}, 100)
+		},
+		filter : function(rawInput) {
+			var done = this.async()
+			setTimeout(done(filterInput(rawInput)) , 100)
 		}
 	}], function (answers) {
 		if(answers.tracker === "q") {
-			self.log(trackers)
+			runScript("init_trackers.sh", trackers)
 			done()
 		} else {
 			trackers.push(answers.tracker)
@@ -70,5 +73,28 @@ function addTracker() {
 			done()
 		}
 	}.bind(self))
+}
+
+function runScript(name, params) {
+	var file_loc = path.join(__dirname, name)
+	var paramsString = ""
+	if(params) {
+		paramsString = params.toString().replace(/,/g, " ")
+	}
+	var script = execSync(file_loc.concat(" "+paramsString))
+	process.stdout.write(script)
+	process.stdout.write('\n')	
+}
+
+function filterInput(rawInput) {
+	var input
+	if(rawInput.length > 1) {
+		input = rawInput.substring(0,1).toLowerCase() + rawInput.substring(1).replace(/[A-Z]/g, function x() {
+			return "_"+arguments[0].toString().toLowerCase()
+		})
+	} else {
+		input = rawInput.toLowerCase()
+	}
+	return input
 }
 
