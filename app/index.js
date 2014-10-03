@@ -43,9 +43,6 @@ function addTracker() {
 		validate : function(input) {
 			filteredInput = filterInput(input)
 			pathLoc = "./app/src/main/res/xml/".concat(filteredInput, ".xml")
-			console.log(pathLoc)
-						console.log("blah")
-
 			if(!input) {
 				return "You need to name your tracker"
 			}
