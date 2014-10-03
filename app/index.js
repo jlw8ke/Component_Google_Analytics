@@ -1,9 +1,9 @@
 var yeoman = require('yeoman-generator'),
-execSync = require("exec-sync"),
+execSync = require('exec-sync'),
 path = require('path'),
 fs = require('fs'),
-self,
-trackers = new Array()
+trackers = new Array(),
+self
 
 module.exports = yeoman.generators.Base.extend({
 	downloadSdk:function() {
@@ -41,23 +41,23 @@ function addTracker() {
 		name : 'tracker',
 		message : 'What is the tracker name: (q to finish)',
 		validate : function(input) {
-			var done = this.async()
-			setTimeout(function() {
-				if(!input) {
-					done("You need to name your tracker")
-					return
-				}
-				if(trackers.indexOf(filterInput(input)) > -1) {
-					done("Tracker already exists")
-					return
-				}
-				var pass = input.match("^([a-z|A-Z])+$")
-				if(!pass) {
-					done("Invalid tracker name, fucker")
-					return
-				}
-				done(true)
-			}, 100)
+			filteredInput = filterInput(input)
+			pathLoc = "./app/src/main/res/xml/".concat(filteredInput, ".xml")
+			console.log(pathLoc)
+						console.log("blah")
+
+			if(!input) {
+				return "You need to name your tracker"
+			}
+			if(fs.existsSync(pathLoc) || 
+				trackers.indexOf(filteredInput) > -1) {
+				return "Tracker already exists"
+			}
+			var pass = input.match("^([a-z|A-Z])+$")
+			if(!pass) {
+				return "Invalid tracker name"
+			}
+			return true
 		},
 		filter : function(rawInput) {
 			var done = this.async()
