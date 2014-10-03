@@ -13,6 +13,6 @@
   "license": "ISC",
   "dependencies": {
     "yeoman-generator": "^0.17.7",
-    "execSync": "~1.0.0"
+    "exec-sync": "~0.1.6"
   }
 }
