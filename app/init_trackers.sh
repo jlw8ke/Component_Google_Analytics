@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo 'imma make these trackers'
+mkdir -p ./app/src/main/res/xml
 for tracker in "$@"
 do
     echo "Initializing tracker: $tracker.xml"
