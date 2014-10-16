@@ -152,6 +152,7 @@ String.prototype.insert = function(data, index) {
 		+ data
 		+ this.substring(index)
 }
+
 String.prototype.compress = function() {
 	return this.replace(/ /g, "").replace(/"/g,"").replace(/'/g,"")
 }
