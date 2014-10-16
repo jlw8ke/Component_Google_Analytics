@@ -1,88 +1,47 @@
 var yeoman = require('yeoman-generator'),
-execSync = require('exec-sync'),
-path = require('path'),
+chalk = require('chalk'),
 fs = require('fs'),
-trackers = new Array(),
 self
 
+//Chalk themes
+var info = chalk.bold.magenta
+var error = chalk.bold.red
+var warning = chalk.bold.yellow
+var success = chalk.bold.green
 
-module.exports = yeoman.generators.Base.extend({
-	setupGooglePlayServices:function() {
-		self = this
-		runScript("add_analytics_dependency.sh")
+var analyticsGenerator = yeoman.generators.Base.extend({
+	greet: function() {
+    	this.log(info("This component will configure the dependencies and boilerplate needed for google analytics"))
+    	this.log(info("Please make sure you are in your project's root directory"))
 	}, 
-	updatePermissions:function() {
-		runScript("update_permissions.sh")		
-	},
-	promptProguard:function() {
-		var done = this.async()
-		this.prompt([{
-			type : 'confirm',
-			name : 'proguard',
-			message : 'Generate Proguard?'
-		}, {
-			when : function(response) { return response.proguard },
-			name : 'proguard_location',
-			message : "Where is the proguard file?",
-			default : './app/proguard-rules.pro'
-		}], function (answers) {
-			if(answers.proguard) {
-				runScript("setup_proguard.sh", [answers.proguard_location])
+	init: function() {
+		self = this
+		this.on('end', function (code)  {
+			this.log('\n')
+			if(code != false) {
+				this.log(success("Finished configuring google analytics"))
+				this.log('\n')
+			} else {
+				this.log(error("Failed to configure google analytics"))
+				this.log('\n')
+				process.exit(1)
 			}
-			done()
-		}.bind(this))
+		})
+
 	},
-	promptTrackerGeneration: addTracker
+	confirmInAndroidProject: function() {
+		var exists = fs.existsSync('settings.gradle')
+		if(!exists) {
+			this.log('\n'+warning("settings.gradle") + error(" not found"))
+			this.log(error("Are you in the android project's root directory?"))
+			this.emit('end', false)
+		}
+		this.log("am i the real life?")
+
+	}
 })
 
-function addTracker() {
-	var done = self.async()
-	self.prompt([{
-		type : 'input',
-		name : 'tracker',
-		message : 'What is the tracker name: (q to finish)',
-		validate : function(input) {
-			filteredInput = filterInput(input)
-			pathLoc = "./app/src/main/res/xml/".concat(filteredInput, ".xml")
-			if(!input) {
-				return "You need to name your tracker"
-			}
-			if(fs.existsSync(pathLoc) || 
-				trackers.indexOf(filteredInput) > -1) {
-				return "Tracker already exists"
-			}
-			var pass = input.match("^([a-z|A-Z])+$")
-			if(!pass) {
-				return "Invalid tracker name"
-			}
-			return true
-		},
-		filter : function(rawInput) {
-			var done = this.async()
-			setTimeout(done(filterInput(rawInput)) , 100)
-		}
-	}], function (answers) {
-		if(answers.tracker === "q") {
-			runScript("init_trackers.sh", trackers)
-			done()
-		} else {
-			trackers.push(answers.tracker)
-			addTracker()
-			done()
-		}
-	}.bind(self))
-}
 
-function runScript(name, params) {
-	var file_loc = path.join(__dirname, name)
-	var paramsString = ""
-	if(params) {
-		paramsString = params.toString().replace(/,/g, " ")
-	}
-	var script = execSync(file_loc.concat(" "+paramsString))
-	process.stdout.write(script)
-	process.stdout.write('\n')	
-}
 
 function filterInput(rawInput) {
 	var input
@@ -95,4 +54,6 @@ function filterInput(rawInput) {
 	}
 	return input
 }
+
+module.exports = analyticsGenerator
 
