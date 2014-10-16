@@ -27,7 +27,6 @@ var analyticsGenerator = yeoman.generators.Base.extend({
 				process.exit(1)
 			}
 		})
-
 	},
 	confirmInAndroidProject: function() {
 		var exists = fs.existsSync('settings.gradle')
