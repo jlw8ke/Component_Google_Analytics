@@ -16,8 +16,12 @@ var network_state_permission = "<uses-permission android:name=\"android.permissi
 
 var manifest_location = "./app/src/main/AndroidManifest.xml"
 var xml_directory_location = "./app/src/main/res/xml/"
+var res_directory_location = "./app/src/main/res"
+var gradle_location = "./app/build.gradle"
 
-var gps_meta_data_check="com.google.android.gms.version"
+var gps_check="com.google.android.gms.version"
+var gps_meta_data = "<meta-data android:name=\"com.google.android.gms.version\"\n\t\tandroid:value=\"@integer/google_play_services_version\" />"
+var gps_dependency = "compile \"com.google.android.gms:play-services:6.1.+\""
 var analyticsGenerator = yeoman.generators.Base.extend({
 	greet: function() {
     	this.log(info("This component will configure the dependencies and boilerplate needed for google analytics"))
@@ -38,12 +42,30 @@ var analyticsGenerator = yeoman.generators.Base.extend({
 			}
 		})	
 	},
-	confirmInAndroidProject: function() {
-		var exists = fs.existsSync('settings.gradle')
-		if(!exists) {
-			this.log('\n'+warning("settings.gradle") + error(" not found"))
-			this.log(error("Are you in the android project's root directory?"))
-			this.emit('end', false)
+	confirmAndroidProject: function() {
+		var in_root = fs.existsSync('settings.gradle')
+		var manifest_exists = fs.existsSync(manifest_location)
+		var gradle_exists = fs.existsSync(gradle_location)
+		var res_exists = fs.existsSync(res_directory_location)
+
+		fail = function(file_name, messages) {
+			self.log('\n'+warning(file_name) + error(" not found"))
+			messages.forEach(function (message) {
+				self.log(error(message))
+			})
+			self.emit('end', false)
+		}
+		if(!in_root) {
+			fail('settings.gradle', "Are you in the android project's root directory?")
+		} else if(!manifest_exists) {
+			fail(manifest_location, ["Are you in the android project's root directory?",
+					"Is the manifest in the correct location?"])
+		} else if(!gradle_exists) {
+			fail(gradle_location, ["Are you in the android project's root directory?",
+					"Is the app gradle file in the correct location?"])
+		} else if(!res_exists) {
+			fail(res_directory_location, ["Are you in the android project's root directory?",
+					"Is the res folder in the correct location"?])
 		}
 	}, 
 	promptTask: function() {
@@ -74,11 +96,15 @@ var analyticsGenerator = yeoman.generators.Base.extend({
 	promptForTrackers: addTracker,
 	addManifestDependencies: function() {
 		this.conflicter.force = true	
+		var manifest = this.readFileAsString(manifest_location)
+		var manifest_begin = manifest.indexOf("<application")	
+
+		this.log(success("Adding google play services meta-data..."))
+		if(!manifest.compress().contains(gps_check)) {
+			manifest = manifest.insert(gps_meta_data+'\n\n', manifest_begin )
+		}
 
 		this.log(success("Adding permissions to the manifest..."))
-		var manifest = this.readFileAsString(manifest_location)
-
-		var manifest_begin = manifest.indexOf("<application")	
 		if(!manifest.compress().contains(network_state_permission.compress())) {
 			manifest = manifest.insert(network_state_permission+'\n\n\t', manifest_begin)
 		}
@@ -88,6 +114,19 @@ var analyticsGenerator = yeoman.generators.Base.extend({
 		
 		this.log(manifest)
 		this.write(manifest_location, manifest)
+	},
+	addGradleDependencies: function() {
+		var gradle_file = this.readFileAsString(gradle_location)
+		var dependency_start = gradle_file.indexOf("dependencies")
+		dependency_start = gradle_file.indexOf("{", dependency_start)+1
+		
+		this.log(success("Adding google play services to gradle dependencies..."))
+		if(!gradle_file.compress().contains(gps_check)) {
+			gradle_file = gradle_file.insert('\n\t'+gps_dependency+'\n\n', dependency_start+1)
+		}
+
+		this.log(gradle_file)
+		this.write(gradle_location, gradle_file)
 	}
 })
 
