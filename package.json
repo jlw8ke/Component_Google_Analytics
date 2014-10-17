@@ -1,5 +1,5 @@
 {
-  "name": "generator-google_analytics",
+  "name": "generator-google_analytics_android",
   "version": "1.0.0",
   "description": "An android component that will configure the necessary google analytics dependencies",
   "main": "app/index.js",
