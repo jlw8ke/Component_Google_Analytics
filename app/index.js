@@ -10,6 +10,7 @@ var error_light = chalk.red
 var error = chalk.bold.red
 var warning = chalk.bold.yellow
 var success = chalk.bold.green
+var success_light = chalk.green
 
 var internet_permission = "<uses-permission android:name=\"android.permission.INTERNET\" />"
 var network_state_permission = "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />"
@@ -72,7 +73,7 @@ var analyticsGenerator = yeoman.generators.Base.extend({
 		var prompts = [{
 			type : 'confirm',
 			name : 'proguard',
-			message : 'Generate Proguard?'
+			message : 'Generate Proguard? (Default yes)'
 		}, {
 			when : function(response) { return response.proguard },
 			name : 'proguard_location',
@@ -88,8 +89,8 @@ var analyticsGenerator = yeoman.generators.Base.extend({
 		}]
 		var done = this.async()
 		this.prompt(prompts, function (answers) {
-			this.proguard = answers.proguard
-			this.proguard_location = answers.proguard_location
+			self.proguard = answers.proguard
+			self.proguard_location = answers.proguard_location
 			done()
 		})
 	}, 
@@ -99,20 +100,27 @@ var analyticsGenerator = yeoman.generators.Base.extend({
 		var manifest = this.readFileAsString(manifest_location)
 		var manifest_begin = manifest.indexOf("<application")	
 
-		this.log(success("Adding google play services meta-data..."))
 		if(!manifest.compress().contains(gps_check)) {
+			this.log(success("Adding google play services meta-data..."))
 			manifest = manifest.insert(gps_meta_data+'\n\n', manifest_begin )
+		} else {
+			this.log(info("Google play services meta-data already in manifest file"))
 		}
 
 		this.log(success("Adding permissions to the manifest..."))
 		if(!manifest.compress().contains(network_state_permission.compress())) {
+			this.log(success_light("Added network state permission"))
 			manifest = manifest.insert(network_state_permission+'\n\n\t', manifest_begin)
+		} else {
+			this.log(info("network state permission already in manifest file"))
 		}
 		if(!manifest.compress().contains(internet_permission.compress())) {
+			this.log(success_light("Added internet permission"))
 			manifest = manifest.insert(internet_permission+'\n\n\t', manifest_begin)
+		} else {
+			this.log(info("internet permisssion already in manifest file"))
 		}
 		
-		this.log(manifest)
 		this.write(manifest_location, manifest)
 	},
 	addGradleDependencies: function() {
@@ -120,17 +128,31 @@ var analyticsGenerator = yeoman.generators.Base.extend({
 		var dependency_start = gradle_file.indexOf("dependencies")
 		dependency_start = gradle_file.indexOf("{", dependency_start)+1
 		
-		this.log(success("Adding google play services to gradle dependencies..."))
 		if(!gradle_file.compress().contains(gps_check)) {
+			this.log(success("Adding google play services to gradle dependencies..."))
 			gradle_file = gradle_file.insert('\n\t'+gps_dependency+'\n\n', dependency_start+1)
+		} else {
+			this.log(info("Google play services dependency already in app/build.gradle"))
 		}
 
-		this.log(gradle_file)
 		this.write(gradle_location, gradle_file)
 	},
 	createProguard: function() {
 		if(this.proguard) {
 			this.log(success("Creating proguard file..."))
+			var proguard_file = this.readFileAsString(this.proguard_location)
+			var proguard_file = proguard_file.concat(this.read("_proguard.pro"))
+			this.write(proguard_file, this.proguard_location)
+		}
+	}, 
+	createTrackers: function() {
+		if(this.trackers.length > 0) {
+			this.log(success("Creating trackers"))
+			this.trackers.forEach(function (tracker) {
+				self.log(success_light("Creating tracker: " + tracker) )
+				self.copy("_tracker.xml", xml_directory_location+tracker+".xml")
+			})
+			this.log('\n')
 		}
 	}
 })
@@ -165,7 +187,6 @@ function addTracker() {
 		}
 	}], function (answers) {
 		if(answers.tracker === "q") {
-			self.log(self.trackers)
 			done()
 		} else {
 			this.trackers.push(answers.tracker)
