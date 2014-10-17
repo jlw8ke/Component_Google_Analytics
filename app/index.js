@@ -65,7 +65,7 @@ var analyticsGenerator = yeoman.generators.Base.extend({
 					"Is the app gradle file in the correct location?"])
 		} else if(!res_exists) {
 			fail(res_directory_location, ["Are you in the android project's root directory?",
-					"Is the res folder in the correct location"?])
+					"Is the res folder in the correct location?"])
 		}
 	}, 
 	promptTask: function() {
