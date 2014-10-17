@@ -19,7 +19,7 @@ var xml_directory_location = "./app/src/main/res/xml/"
 var res_directory_location = "./app/src/main/res"
 var gradle_location = "./app/build.gradle"
 
-var gps_check="com.google.android.gms.version"
+var gps_check="com.google.android.gms"
 var gps_meta_data = "<meta-data android:name=\"com.google.android.gms.version\"\n\t\tandroid:value=\"@integer/google_play_services_version\" />"
 var gps_dependency = "compile \"com.google.android.gms:play-services:6.1.+\""
 var analyticsGenerator = yeoman.generators.Base.extend({
@@ -127,6 +127,11 @@ var analyticsGenerator = yeoman.generators.Base.extend({
 
 		this.log(gradle_file)
 		this.write(gradle_location, gradle_file)
+	},
+	createProguard: function() {
+		if(this.proguard) {
+			this.log(success("Creating proguard file..."))
+		}
 	}
 })
 
