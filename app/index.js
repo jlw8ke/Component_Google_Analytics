@@ -142,7 +142,7 @@ var analyticsGenerator = yeoman.generators.Base.extend({
 			this.log(success("Creating proguard file..."))
 			var proguard_file = this.readFileAsString(this.proguard_location)
 			var proguard_file = proguard_file.concat(this.read("_proguard.pro"))
-			this.write(proguard_file, this.proguard_location)
+			this.write(this.proguard_location, proguard_file)
 		}
 	}, 
 	createTrackers: function() {
