@@ -1,4 +1,4 @@
--keep class * extends java.util.ListResourceBundle {
+keep class * extends java.util.ListResourceBundle {
     protected Object[][] getContents();
 }
 
